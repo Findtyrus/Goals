@@ -1,98 +1,90 @@
 import { useState, useRef, useEffect, useCallback } from "react";
 
 const STORAGE_KEY = "tyrus-blueprint-v1";
+const SUPABASE_URL = "https://safiinhcwuseiohpouue.supabase.co";
+const SUPABASE_KEY = "sb_publishable_oBrSbZwTc3T6MOZ5654t5g_ISF9kYxJ";
 
 const initialGoals = [
   {
-    phase: 1, phaseLabel: "Right Now", phaseYears: "2026",
-    phaseDesc: "Finish strong, pass the SIE, crush HRK, dominate the fall career fair.",
+    phase: 1, phaseLabel: "Finish Strong", phaseYears: "2026-2027",
+    phaseDesc: "Finish the year off strong.",
     items: [
       { id: 101, text: "Pass the SIE exam", tag: "Career", targetDate: "2026-06-13" },
-      { id: 102, text: "Crush the HRK tax internship", tag: "Career", targetDate: "2026-07-31" },
-      { id: 103, text: "Dominate the fall career fair — replace CLA offer", tag: "Career", targetDate: "2026-09-30" },
-      { id: 104, text: "Graduate with Bachelor of Accountancy", tag: "Career", targetDate: "2026-12-15" },
-      { id: 105, text: "Save and invest $5–10K before graduation", tag: "Finance", targetDate: "2026-12-01" },
-      { id: 106, text: "Reach high 700s credit score", tag: "Finance", targetDate: "2026-12-01" },
+      { id: 102, text: "Master financial modeling (LBO, 3 Statement)", tag: "Career", targetDate: "2027-03-31" },
+      { id: 103, text: "Complete HRK tax internship", tag: "Career", targetDate: "2026-07-31" },
+      { id: 104, text: "Recruit during the fall career fair", tag: "Career", targetDate: "2026-09-30" },
+      { id: 105, text: "Graduate with Bachelor of Accountancy", tag: "Career", targetDate: "2026-12-15" },
+      { id: 106, text: "Save and invest $5–10K before graduation", tag: "Finance", targetDate: "2026-12-01" },
       { id: 107, text: "Pay off all current debt", tag: "Finance", targetDate: "2026-12-01" },
-      { id: 108, text: "Open a credit builder loan through a bank", tag: "Finance", targetDate: "2026-09-01" },
-      { id: 109, text: "Invest into stocks monthly — no matter the amount", tag: "Finance", targetDate: "2026-06-01" },
-      { id: 110, text: "Start building social media presence", tag: "Brand", targetDate: "2026-08-01" },
+      { id: 108, text: "GMAT exam - MSU Testing center", tag: "Career", targetDate: "2026-08-01" },
+      { id: 109, text: "Get accepted into Ole Miss Graduate School", tag: "Career", targetDate: "2026-08-01" },
     ],
   },
   {
-    phase: 2, phaseLabel: "Grad School", phaseYears: "Jan 2027 – May 2028",
-    phaseDesc: "CLA internship or better, MAcc, CPA exams, get licensed, keep building.",
+    phase: 2, phaseLabel: "Post Grad - Grad School", phaseYears: "Jan 2027 – May 2028",
+    phaseDesc: "Internship, MAcc, CPA exams, enjoy the journey.",
     items: [
-      { id: 201, text: "Complete CLA Nashville internship (or upgraded offer)", tag: "Career", targetDate: "2027-03-31" },
-      { id: 202, text: "Start and complete MAcc at MSU", tag: "Career", targetDate: "2028-05-15" },
-      { id: 203, text: "Pass all four CPA exam sections", tag: "Career", targetDate: "2028-05-01" },
-      { id: 204, text: "Earn CPA license", tag: "Career", targetDate: "2028-06-01" },
-      { id: 205, text: "Get an apartment after college", tag: "Life", targetDate: "2027-01-01" },
-      { id: 206, text: "Build large emergency fund — 5–6 months of expenses", tag: "Finance", targetDate: "2028-01-01" },
-      { id: 207, text: "Invest ≥15% of take-home pay into brokerage and Roth IRA", tag: "Finance", targetDate: "2027-06-01" },
-      { id: 208, text: "Hit $50K invested", tag: "Finance", targetDate: "2028-05-01" },
-      { id: 209, text: "Build out wardrobe — suits, old money aesthetic, quality basics", tag: "Personal", targetDate: "2027-06-01" },
-      { id: 210, text: "Professional teeth whitening / veneers", tag: "Personal", targetDate: "2027-12-01" },
-      { id: 211, text: "Get my first gun", tag: "Personal", targetDate: "2027-09-01" },
-      { id: 212, text: "Run a half marathon", tag: "Fitness", targetDate: "2027-10-01" },
-      { id: 213, text: "Compete in a powerlifting competition", tag: "Fitness", targetDate: "2028-03-01" },
-      { id: 214, text: "Open Amazon FBA — build to $5K/month recurring", tag: "Business", targetDate: "2028-01-01" },
-      { id: 215, text: "Own a Buick Grand National, Cutlass, Caprice, SS Monte Carlo, or Box Chevy", tag: "Lifestyle", targetDate: "2027-12-01" },
-      { id: 216, text: "Own multiple Rolexes (reps)", tag: "Lifestyle", targetDate: "2028-01-01" },
+      { id: 201, text: "Complete Spring 2027 Internship (CLA)", tag: "Career", targetDate: "2027-03-31" },
+      { id: 202, text: "Complete MADA at Ole Miss", tag: "Career", targetDate: "2028-05-15" },
+      { id: 203, text: "Pass all four CPA sections", tag: "Career", targetDate: "2028-05-01" },
+      { id: 204, text: "Land a Full-Time Position", tag: "Career", targetDate: "2028-05-01" },
+      { id: 205, text: "Choose relocation", tag: "Life", targetDate: "2027-01-01" },
+      { id: 206, text: "Build out wardrobe, accessories", tag: "Personal", targetDate: "2027-06-01" },
+      { id: 207, text: "Run a sprint/olympic distance tri", tag: "Fitness", targetDate: "2027-10-01" },
+      { id: 208, text: "First long term relationship", tag: "Life", targetDate: "2028-04-01" },
     ],
   },
   {
     phase: 3, phaseLabel: "Early Career", phaseYears: "Mid 2028 – 2031",
-    phaseDesc: "Land the Big 4 or top-20 role, relocate to Austin, stack real deal experience.",
+    phaseDesc: "Being Full-time, relocate, gain real experience.",
     items: [
-      { id: 301, text: "Land audit or TAS role at Big 4 or top-20 firm", tag: "Career", targetDate: "2028-08-01" },
-      { id: 302, text: "Relocate to Austin, TX", tag: "Life", targetDate: "2028-09-01" },
-      { id: 303, text: "Get first promotion at the firm", tag: "Career", targetDate: "2030-01-01" },
-      { id: 304, text: "Hit $100K invested", tag: "Finance", targetDate: "2030-06-01" },
-      { id: 305, text: "Compete in a bodybuilding show — document the whole process", tag: "Fitness", targetDate: "2029-06-01" },
-      { id: 306, text: "Run a full marathon", tag: "Fitness", targetDate: "2029-12-01" },
-      { id: 307, text: "Buy first cash-flowing business", tag: "Business", targetDate: "2030-01-01" },
-      { id: 308, text: "Own a Mercedes 190E or 300CE", tag: "Lifestyle", targetDate: "2029-06-01" },
-      { id: 309, text: "Get pilot's license", tag: "Personal", targetDate: "2030-06-01" },
-      { id: 310, text: "Start traveling the world — a lot of nice trips", tag: "Lifestyle", targetDate: "2029-01-01" },
+      { id: 302, text: "Relocate to TX, TN, IL, NY, FL", tag: "Life", targetDate: "2028-09-01" },
+      { id: 303, text: "Join ACG", tag: "Career", targetDate: "2029-12-01" },
+      { id: 304, text: "Get first promotion within firm", tag: "Career", targetDate: "2030-01-01" },
+      { id: 305, text: "Compete in a bodybuilding show", tag: "Fitness", targetDate: "2029-06-01" },
+      { id: 306, text: "Run a half ironman 70.3", tag: "Fitness", targetDate: "2029-12-01" },
+      { id: 307, text: "Start traveling the world", tag: "Lifestyle", targetDate: "2029-01-01" },
+      { id: 308, text: "Build emergency fund 3-6 months of expenses", tag: "Life", targetDate: "2030-01-01" },
+      { id: 309, text: "Invest ≥15% of take-home pay into brokerage and Roth IRA", tag: "Finance", targetDate: "2028-06-01" },
+      { id: 310, text: "Hit $50K invested", tag: "Finance", targetDate: "2028-05-01" },
+      { id: 311, text: "Buy an e-dirt bike", tag: "Lifestyle", targetDate: "2031-06-01" },
+      { id: 312, text: "Launch the clothing brand / men's clothing store", tag: "Business", targetDate: "2031-01-01" },
     ],
   },
   {
-    phase: 4, phaseLabel: "MBA & IB", phaseYears: "2031 – 2034",
-    phaseDesc: "MLT/Consortium scholarship, top MBA, break into IB or M&A, first real acquisition.",
+    phase: 4, phaseLabel: "Mid Career", phaseYears: "2031 – 2034",
+    phaseDesc: "Get real on trajectory and vision",
     items: [
-      { id: 401, text: "Secure MBA scholarship via MLT or Consortium", tag: "Career", targetDate: "2031-04-01" },
-      { id: 402, text: "Complete MBA at Ross, Darden, Fuqua, Kelley, or Columbia", tag: "Career", targetDate: "2033-05-01" },
-      { id: 403, text: "Break into IB via MBA summer internship", tag: "Career", targetDate: "2032-08-01" },
-      { id: 404, text: "Land full-time IB or M&A advisory role post-MBA", tag: "Career", targetDate: "2033-08-01" },
-      { id: 405, text: "Hit $250K invested", tag: "Finance", targetDate: "2033-01-01" },
-      { id: 406, text: "Launch the clothing brand / men's clothing store", tag: "Business", targetDate: "2032-01-01" },
-      { id: 407, text: "Run an Ironman 70.3", tag: "Fitness", targetDate: "2032-06-01" },
-      { id: 408, text: "Buy an e-dirt bike", tag: "Lifestyle", targetDate: "2031-06-01" },
-      { id: 409, text: "Own a nice home", tag: "Life", targetDate: "2033-01-01" },
+      { id: 401, text: "Transfer to TAS/DAS internally or externally", tag: "Career", targetDate: "2031-04-01" },
+      { id: 402, text: "Get ABV, CFF, CFA L1/2", tag: "Finance", targetDate: "2031-01-01" },
+      { id: 403, text: "Hit $100K invested", tag: "Finance", targetDate: "2033-01-01" },
+      { id: 404, text: "Run a full Ironman", tag: "Fitness", targetDate: "2032-06-01" },
+      { id: 405, text: "Get Married", tag: "Life", targetDate: "2032-06-01" },
+      { id: 406, text: "Have children", tag: "Life", targetDate: "2034-01-01" },
+      { id: 407, text: "Begin home search", tag: "Life", targetDate: "2033-01-01" },
+      { id: 408, text: "Get pilot's license", tag: "Personal", targetDate: "2034-06-01" },
     ],
   },
   {
-    phase: 5, phaseLabel: "Scale", phaseYears: "2034 – 2040",
-    phaseDesc: "Multiple businesses, $500K+ invested, family, physical peak, real Rolexes.",
+    phase: 5, phaseLabel: "Late Career", phaseYears: "2034 – 2040",
+    phaseDesc: "Multiple businesses, $500K+ invested, family, physical peak",
     items: [
-      { id: 501, text: "Hit $500K invested", tag: "Finance", targetDate: "2036-01-01" },
-      { id: 502, text: "Own accounting firms", tag: "Business", targetDate: "2035-01-01" },
-      { id: 503, text: "Own 10 businesses across different verticals", tag: "Business", targetDate: "2038-01-01" },
-      { id: 504, text: "Run a full Ironman", tag: "Fitness", targetDate: "2035-09-01" },
-      { id: 505, text: "Get married", tag: "Life", targetDate: "2035-01-01" },
-      { id: 506, text: "Have 2–3 children", tag: "Life", targetDate: "2038-01-01" },
-      { id: 507, text: "Own a Porsche 911", tag: "Lifestyle", targetDate: "2036-01-01" },
-      { id: 508, text: "Own real Rolexes", tag: "Lifestyle", targetDate: "2036-01-01" },
+      { id: 501, text: "Hit $200K invested", tag: "Finance", targetDate: "2036-01-01" },
+      { id: 502, text: "Land PE or M&A advisory role post-TAS/DAS", tag: "Career", targetDate: "2034-08-01" },
+      { id: 503, text: "Buy first cash-flowing business", tag: "Business", targetDate: "2035-01-01" },
+      { id: 504, text: "Own a Porsche 911", tag: "Lifestyle", targetDate: "2036-01-01" },
+      { id: 505, text: "Own a Buick Grand National, Cutlass, Caprice, SS Monte Carlo, or Box Chevy", tag: "Lifestyle", targetDate: "2035-01-01" },
     ],
   },
   {
     phase: 6, phaseLabel: "Legacy", phaseYears: "2040+",
     phaseDesc: "Permanent capital. Generational wealth. The empire is built.",
     items: [
-      { id: 601, text: "Hit $1M invested", tag: "Finance", targetDate: "2040-01-01" },
-      { id: 602, text: "Start a private equity fund", tag: "Business", targetDate: "2040-01-01" },
-      { id: 603, text: "Build holding company to $10M+ in revenue", tag: "Business", targetDate: "2042-01-01" },
+      { id: 601, text: "Hit $1M+ nvested", tag: "Finance", targetDate: "2040-01-01" },
+      { id: 602, text: "Start a private equity fund/Holding Company", tag: "Business", targetDate: "2040-01-01" },
+      { id: 603, text: "Own accounting firms", tag: "Business", targetDate: "2040-01-01" },
+      { id: 604, text: "Own 10 businesses across different verticals", tag: "Business", targetDate: "2040-01-01" },
+      { id: 605, text: "Build holding company to $10M+ in revenue", tag: "Business", targetDate: "2042-01-01" },
     ],
   },
 ];
@@ -122,7 +114,7 @@ function daysUntil(d) {
 }
 function isOverdue(d, done) { return !done && !!d && daysUntil(d) < 0; }
 
-// ── localStorage helpers (replaces window.storage) ────────
+// ── localStorage helpers (fast local cache) ────────
 function lsLoad() {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
@@ -131,6 +123,31 @@ function lsLoad() {
 }
 function lsSave(data) {
   try { localStorage.setItem(STORAGE_KEY, JSON.stringify(data)); } catch {}
+}
+
+// ── Supabase helpers (source of truth, synced across devices) ────────
+async function supaLoad() {
+  try {
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/blueprint_data?id=eq.main&select=data`, {
+      headers: { apikey: SUPABASE_KEY, Authorization: `Bearer ${SUPABASE_KEY}` },
+    });
+    const rows = await res.json();
+    return rows && rows[0] ? rows[0].data : null;
+  } catch { return null; }
+}
+async function supaSave(data) {
+  try {
+    await fetch(`${SUPABASE_URL}/rest/v1/blueprint_data`, {
+      method: "POST",
+      headers: {
+        apikey: SUPABASE_KEY,
+        Authorization: `Bearer ${SUPABASE_KEY}`,
+        "Content-Type": "application/json",
+        Prefer: "resolution=merge-duplicates",
+      },
+      body: JSON.stringify({ id: "main", data, updated_at: new Date().toISOString() }),
+    });
+  } catch {}
 }
 
 export default function App() {
@@ -151,24 +168,35 @@ export default function App() {
   const [saveFlash, setSaveFlash]       = useState(false);
   const nextId = useRef(9000);
 
-  // LOAD
+  // LOAD — show local cache instantly, then reconcile with Supabase
   useEffect(() => {
-    const data = lsLoad();
-    if (data) {
-      if (data.goals)          setGoals(data.goals);
-      if (data.checked)        setChecked(data.checked);
-      if (data.completedDates) setCompletedDates(data.completedDates);
-      if (data.nextId)         nextId.current = data.nextId;
+    const cached = lsLoad();
+    if (cached) {
+      if (cached.goals)          setGoals(cached.goals);
+      if (cached.checked)        setChecked(cached.checked);
+      if (cached.completedDates) setCompletedDates(cached.completedDates);
+      if (cached.nextId)         nextId.current = cached.nextId;
     }
-    setLoaded(true);
+    (async () => {
+      const remote = await supaLoad();
+      if (remote) {
+        if (remote.goals)          setGoals(remote.goals);
+        if (remote.checked)        setChecked(remote.checked);
+        if (remote.completedDates) setCompletedDates(remote.completedDates);
+        if (remote.nextId)         nextId.current = remote.nextId;
+      }
+      setLoaded(true);
+    })();
   }, []);
 
-  // SAVE (debounced)
+  // SAVE (debounced) — writes to Supabase, mirrors to localStorage for fast next load
   const saveTimer = useRef(null);
   const persist = useCallback((g, c, cd) => {
     clearTimeout(saveTimer.current);
-    saveTimer.current = setTimeout(() => {
-      lsSave({ goals: g, checked: c, completedDates: cd, nextId: nextId.current });
+    saveTimer.current = setTimeout(async () => {
+      const payload = { goals: g, checked: c, completedDates: cd, nextId: nextId.current };
+      lsSave(payload);
+      await supaSave(payload);
       setSaveFlash(true);
       setTimeout(() => setSaveFlash(false), 1200);
     }, 500);
@@ -208,6 +236,7 @@ export default function App() {
       p.phase === phaseNum ? { ...p, items: p.items.filter((i) => i.id !== id) } : p
     ));
     setChecked((p) => { const n = {...p}; delete n[id]; return n; });
+    setCompletedDates((p) => { const n = {...p}; delete n[id]; return n; });
   };
 
   const moveGoal = (goalId, fromPhase, toPhase) => {
